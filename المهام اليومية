@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Tasks</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background:#0f172a;
+  color:white;
+}
+
+header {
+  background:#020617;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+}
+
+.container {
+  padding:15px;
+}
+
+input, select {
+  padding:10px;
+  margin:5px;
+  width:90%;
+  border:none;
+  border-radius:8px;
+}
+
+button {
+  padding:10px;
+  margin-top:10px;
+  width:95%;
+  border:none;
+  border-radius:8px;
+  background:#22c55e;
+  color:white;
+  font-size:16px;
+}
+
+.task {
+  background:#1e293b;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.done {
+  text-decoration: line-through;
+  opacity:0.6;
+}
+
+.badge {
+  font-size:12px;
+  padding:3px 8px;
+  border-radius:6px;
+}
+
+.work { background:#3b82f6; }
+.study { background:#a855f7; }
+.life { background:#f97316; }
+
+.actions button {
+  margin-left:5px;
+  padding:5px;
+  font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>📋 مهامي اليومية</header>
+
+<div class="container">
+
+<input id="taskInput" placeholder="اكتب المهمة...">
+
+<select id="category">
+  <option value="work">عمل</option>
+  <option value="study">دراسة</option>
+  <option value="life">شخصي</option>
+</select>
+
+<input type="datetime-local" id="date">
+
+<button onclick="addTask()">➕ إضافة مهمة</button>
+
+<div id="tasks"></div>
+
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+function save() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function render() {
+  let container = document.getElementById("tasks");
+  container.innerHTML = "";
+
+  tasks.forEach((task, i) => {
+    container.innerHTML += `
+      <div class="task ${task.done ? 'done' : ''}">
+        <div>
+          <div>${task.text}</div>
+          <small>${task.date || ""}</small><br>
+          <span class="badge ${task.category}">
+            ${task.category}
+          </span>
+        </div>
+
+        <div class="actions">
+          <button onclick="toggle(${i})">✔️</button>
+          <button onclick="deleteTask(${i})">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function addTask() {
+  let text = document.getElementById("taskInput").value;
+  let category = document.getElementById("category").value;
+  let date = document.getElementById("date").value;
+
+  if(text === "") return;
+
+  tasks.push({text, category, date, done:false});
+  save();
+  render();
+
+  document.getElementById("taskInput").value = "";
+}
+
+function toggle(i) {
+  tasks[i].done = !tasks[i].done;
+  save();
+  render();
+}
+
+function deleteTask(i) {
+  tasks.splice(i,1);
+  save();
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
