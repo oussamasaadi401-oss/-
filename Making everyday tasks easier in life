@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مدير المهام المتقدم | Pro Task Manager</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Cairo', 'Tahoma', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+  color: #333;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+/* header */
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.header p {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+/* stats bar */
+.stats {
+  display: flex;
+  justify-content: space-around;
+  background: #f8f9fa;
+  padding: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.stat-card {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* form */
+.form-section {
+  padding: 25px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* filters */
+.filters {
+  display: flex;
+  gap: 10px;
+  padding: 15px 25px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.filter-btn.active {
+  background: #667eea;
+  color: white;
+}
+
+/* tasks list */
+.tasks-section {
+  padding: 25px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.task {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 12px;
+  transition: all 0.3s;
+  border-right: 4px solid #667eea;
+}
+
+.task:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.task.done {
+  opacity: 0.6;
+  border-right-color: #28a745;
+}
+
+.task.done .task-title {
+  text-decoration: line-through;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.task-title {
+  font-size: 16px;
+  font-weight: bold;
+  flex: 1;
+  word-break: break-word;
+}
+
+.task-category {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+}
+
+.category-work { background: #3b82f6; }
+.category-study { background: #a855f7; }
+.category-life { background: #f97316; }
+.category-health { background: #10b981; }
+.category-shopping { background: #ef4444; }
+
+.task-description {
+  font-size: 13px;
+  color: #666;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.task-date {
+  font-size: 11px;
+  color: #999;
+  margin-top: 5px;
+  display: inline-block;
+}
+
+.task-priority {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  margin-right: 8px;
+}
+
+.priority-high { background: #fee; color: #ef4444; }
+.priority-medium { background: #fef3c7; color: #f59e0b; }
+.priority-low { background: #d1fae5; color: #10b981; }
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.task-actions button {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.btn-done { background: #10b981; color: white; }
+.btn-edit { background: #3b82f6; color: white; }
+.btn-delete { background: #ef4444; color: white; }
+
+.empty-state {
+  text-align: center;
+  padding: 50px;
+  color: #999;
+}
+
+/* modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.close {
+  cursor: pointer;
+  font-size: 24px;
+  color: #999;
+}
+
+/* responsive */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  
+  .task-header {
+    flex-direction: column;
+  }
+  
+  .filters {
+    flex-direction: column;
+  }
+  
+  .filter-btn {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>📋 مدير المهام المتقدم</h1>
+    <p>نظم مهامك بذكاء واحترافية</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number" id="totalTasks">0</div>
+      <div class="stat-label">إجمالي المهام</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="completedTasks">0</div>
+      <div class="stat-label">مكتملة</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="pendingTasks">0</div>
+      <div class="stat-label">قيد التنفيذ</div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-group">
+      <label>📝 عنوان المهمة *</label>
+      <input type="text" id="taskTitle" placeholder="مثال: إنهاء تقرير المشروع">
+    </div>
+
+    <div class="form-group">
+      <label>📄 وصف المهمة</label>
+      <textarea id="taskDesc" placeholder="تفاصيل إضافية عن المهمة..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>🏷️ التصنيف</label>
+      <select id="taskCategory">
+        <option value="work">💼 عمل</option>
+        <option value="study">📚 دراسة</option>
+        <option value="life">🏠 شخصي</option>
+        <option value="health">💪 صحة</option>
+        <option value="shopping">🛒 تسوق</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>⚠️ الأولوية</label>
+      <select id="taskPriority">
+        <option value="high">🔴 عالية</option>
+        <option value="medium">🟡 متوسطة</option>
+        <option value="low">🟢 منخفضة</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>📅 التاريخ والوقت</label>
+      <input type="datetime-local" id="taskDate">
+    </div>
+
+    <button class="btn" onclick="addTask()">➕ إضافة مهمة جديدة</button>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterTasks('all')">الكل</button>
+    <button class="filter-btn" onclick="filterTasks('active')">غير مكتملة</button>
+    <button class="filter-btn" onclick="filterTasks('completed')">مكتملة</button>
+  </div>
+
+  <div class="tasks-section" id="tasksContainer">
+    <!-- المهام ستظهر هنا -->
+  </div>
+</div>
+
+<!-- Modal للتعديل -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>✏️ تعديل المهمة</h3>
+      <span class="close" onclick="closeModal()">&times;</span>
+    </div>
+    <div id="editForm">
+      <div class="form-group">
+        <label>العنوان</label>
+        <input type="text" id="editTitle">
+      </div>
+      <div class="form-group">
+        <label>الوصف</label>
+        <textarea id="editDesc"></textarea>
+      </div>
+      <div class="form-group">
+        <label>التصنيف</label>
+        <select id="editCategory"></select>
+      </div>
+      <div class="form-group">
+        <label>الأولوية</label>
+        <select id="editPriority"></select>
+      </div>
+      <div class="form-group">
+        <label>التاريخ</label>
+        <input type="datetime-local" id="editDate">
+      </div>
+      <button class="btn" onclick="saveEdit()">💾 حفظ التعديلات</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// تحميل المهام من التخزين المحلي
+let tasks = JSON.parse(localStorage.getItem('proTasks')) || [];
+let currentFilter = 'all';
+let editIndex = null;
+
+// تهيئة التصنيفات في نموذج التعديل
+function initEditSelects() {
+  const categorySelect = document.getElementById('editCategory');
+  const prioritySelect = document.getElementById('editPriority');
+  
+  categorySelect.innerHTML = `
+    <option value="work">💼 عمل</option>
+    <option value="study">📚 دراسة</option>
+    <option value="life">🏠 شخصي</option>
+    <option value="health">💪 صحة</option>
+    <option value="shopping">🛒 تسوق</option>
+  `;
+  
+  prioritySelect.innerHTML = `
+    <option value="high">🔴 عالية</option>
+    <option value="medium">🟡 متوسطة</option>
+    <option value="low">🟢 منخفضة</option>
+  `;
+}
+
+// حفظ المهام
+function saveTasks() {
+  localStorage.setItem('proTasks', JSON.stringify(tasks));
+  updateStats();
+  renderTasks();
+}
+
+// تحديث الإحصائيات
+function updateStats() {
+  const total = tasks.length;
+  const completed = tasks.filter(t => t.done).length;
+  const pending = total - completed;
+  
+  document.getElementById('totalTasks').textContent = total;
+  document.getElementById('completedTasks').textContent = completed;
+  document.getElementById('pendingTasks').textContent = pending;
+}
+
+// إضافة مهمة جديدة
+function addTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  const description = document.getElementById('taskDesc').value;
+  const category = document.getElementById('taskCategory').value;
+  const priority = document.getElementById('taskPriority').value;
+  const date = document.getElementById('taskDate').value;
+  
+  if (title === '') {
+    alert('❌ الرجاء إدخال عنوان المهمة');
+    return;
+  }
+  
+  const task = {
+    id: Date.now(),
+    title: title,
+    description: description,
+    category: category,
+    priority: priority,
+    date: date,
+    done: false,
+    createdAt: new Date().toISOString()
+  };
+  
+  tasks.unshift(task);
+  saveTasks();
+  
+  // تفريغ الحقول
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskDesc').value = '';
+  document.getElementById('taskDate').value = '';
+}
+
+// تبديل حالة الإكمال
+function toggleTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (task) {
+    task.done = !task.done;
+    saveTasks();
+  }
+}
+
+// حذف مهمة
+function deleteTask(id) {
+  if (confirm('⚠️ هل أنت متأكد من حذف هذه المهمة؟')) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveTasks();
+  }
+}
+
+// فتح نافذة التعديل
+function editTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  
+  editIndex = tasks.indexOf(task);
+  
+  document.getElementById('editTitle').value = task.title;
+  document.getElementById('editDesc').value = task.description;
+  document.getElementById('editCategory').value = task.category;
+  document.getElementById('editPriority').value = task.priority;
+  document.getElementById('editDate').value = task.date || '';
+  
+  document.getElementById('editModal').style.display = 'flex';
+}
+
+// حفظ التعديلات
+function saveEdit() {
+  if (editIndex !== null && tasks[editIndex]) {
+    tasks[editIndex].title = document.getElementById('editTitle').value;
+    tasks[editIndex].description = document.getElementById('editDesc').value;
+    tasks[editIndex].category = document.getElementById('editCategory').value;
+    tasks[editIndex].priority = document.getElementById('editPriority').value;
+    tasks[editIndex].date = document.getElementById('editDate').value;
+    
+    saveTasks();
+    closeModal();
+  }
+}
+
+// إغلاق النافذة
+function closeModal() {
+  document.getElementById('editModal').style.display = 'none';
+  editIndex = null;
+}
+
+// تصفية المهام
+function filterTasks(filter) {
+  currentFilter = filter;
+  
+  // تحديث مظهر الأزرار
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  renderTasks();
+}
+
+// عرض المهام
+function renderTasks() {
+  const container = document.getElementById('tasksContainer');
+  
+  let filteredTasks = [...tasks];
+  
+  if (currentFilter === 'active') {
+    filteredTasks = filteredTasks.filter(t => !t.done);
+  } else if (currentFilter === 'completed') {
+    filteredTasks = filteredTasks.filter(t => t.done);
+  }
+  
+  if (filteredTasks.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        📭 لا توجد مهام
+        <br>
+        <small>أضف مهمتك الأولى الآن!</small>
+      </div>
+    `;
+    return;
+  }
+  
+  const categoryNames = {
+    work: '💼 عمل',
+    study: '📚 دراسة',
+    life: '🏠 شخصي',
+    health: '💪 صحة',
+    shopping: '🛒 تسوق'
+  };
+  
+  const priorityNames = {
+    high: '🔴 عالية',
+    medium: '🟡 متوسطة',
+    low: '🟢 منخفضة'
+  };
+  
+  container.innerHTML = filteredTasks.map(task => `
+    <div class="task ${task.done ? 'done' : ''}">
+      <div class="task-header">
+        <div class="task-title">${escapeHtml(task.title)}</div>
+        <div>
+          <span class="task-category category-${task.category}">
+            ${categoryNames[task.category]}
+          </span>
+          <span class="task-priority priority-${task.priority}">
+            ${priorityNames[task.priority]}
+          </span>
+        </div>
+      </div>
+      ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
+      ${task.date ? `<div class="task-date">📅 ${formatDate(task.date)}</div>` : ''}
+      <div class="task-actions">
+        <button class="btn-done" onclick="toggleTask(${task.id})">
+          ${task.done ? '🔄 إعادة فتح' : '✔️ إكمال'}
+        </button>
+        <button class="btn-edit" onclick="editTask(${task.id})">✏️ تعديل</button>
+        <button class="btn-delete" onclick="deleteTask(${task.id})">🗑️ حذف</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// تنسيق التاريخ
+function formatDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleString('ar-EG', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+// منع هجمات XSS
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// إغلاق المودال عند الضغط خارجها
+window.onclick = function(event) {
+  const modal = document.getElementById('editModal');
+  if (event.target === modal) {
+    closeModal();
+  }
+}
+
+// تهيئة الصفحة
+initEditSelects();
+renderTasks();
+updateStats();
+
+// حفظ المهام عند إغلاق الصفحة
+window.onbeforeunload = function() {
+  saveTasks();
+}
+</script>
+
+</body>
+</html>
